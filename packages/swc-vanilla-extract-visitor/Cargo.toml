@@ -1,0 +1,13 @@
+[package]
+authors     = ["OJ Kwon <kwon.ohjoong@gmail.com>"]
+description = ""
+edition     = "2021"
+license     = "MIT"
+name        = "swc-vanilla-extract-visitor"
+repository  = "https://github.com/kwonoj/swc-plugin-vanilla-extract"
+version     = "0.0.11"
+
+[dependencies]
+
+[dev-dependencies]
+pretty_assertions = "1.3.0"

@@ -1,0 +1,13 @@
+/target
+Cargo.lock
+node_modules/
+.swc/
+*.log
+*.node
+index.d.ts
+index.js
+spec/swc-vanilla-custom-transform/target/
+a.js
+swc-plugin-vanilla-*.tgz
+/tmp
+trace-*.json

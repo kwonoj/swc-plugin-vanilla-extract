@@ -1,0 +1,8 @@
+[workspace]
+members = [
+  "packages/swc-plugin-vanilla-extract",
+  "packages/swc-vanilla-extract-visitor"
+]
+
+[profile.release]
+lto = true

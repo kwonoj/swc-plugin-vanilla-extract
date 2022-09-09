@@ -1,0 +1,13 @@
+[package]
+authors     = ["OJ Kwon <kwon.ohjoong@gmail.com>"]
+description = ""
+edition     = "2021"
+license     = "MIT"
+name        = "swc-plugin-vanilla-extract"
+repository  = "https://github.com/kwonoj/swc-plugin-vanilla-extract"
+version     = "0.0.1"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
