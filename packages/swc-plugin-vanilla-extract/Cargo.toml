@@ -11,3 +11,4 @@ version     = "0.0.1"
 crate-type = ["cdylib"]
 
 [dependencies]
+swc_core                = { version = "0.22.0", features = ["plugin_transform"] }

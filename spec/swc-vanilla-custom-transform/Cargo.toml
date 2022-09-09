@@ -1,0 +1,32 @@
+[package]
+edition = "2021"
+name    = "swc-vanilla-custom-transform"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[build-dependencies]
+napi-build = "2.0.1"
+
+[dependencies]
+anyhow = "1.0.64"
+backtrace = "0.3.66"
+napi = { version = "2.9.0", default-features = false, features = [
+  "napi3",
+  "serde-json",
+] }
+napi-derive = { version = "2.9.0", default-features = false, features = [
+  "type-def",
+] }
+serde = { version = "1.0.144", features = ["derive"] }
+serde_json = { version = "1.0.85", features = ["unbounded_depth"] }
+
+swc_core = { version = "0.22.0", features = [
+  "common_concurrent",
+  "ecma_transforms",
+  "ecma_ast",
+  "allocator_node",
+  "ecma_visit",
+  "base_node",
+] }

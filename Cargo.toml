@@ -1,4 +1,5 @@
 [workspace]
+exclude = ["spec/swc-vanilla-custom-transform"]
 members = [
   "packages/swc-plugin-vanilla-extract",
   "packages/swc-vanilla-extract-visitor"

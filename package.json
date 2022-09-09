@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "prepublishOnly": "npm-run-all test && npm run build:plugin -- --release",
-    "build:all": "npm-run-all build:customtransform build:instrument build:plugin",
+    "build:all": "npm-run-all build:customtransform build:plugin",
     "build:customtransform": "napi build --platform --cargo-cwd ./spec/swc-vanilla-custom-transform",
     "build:plugin": "cargo build -p swc-plugin-vanilla-extract --target wasm32-wasi",
     "test:plugin": "npm-run-all build:all && mocha",
