@@ -8,6 +8,7 @@ const pluginBinary = path.resolve(
 
 const transform = (
   code: string,
+  module?: 'commonjs' | 'es6',
   transformOptions?: Options,
   filename?: string
 ) => {
@@ -25,7 +26,7 @@ const transform = (
     },
     isModule: transformOptions?.isModule ?? true,
     module: {
-      type: "commonjs",
+      type: module || "es6",
       strict: !!transformOptions?.isModule ?? false,
     },
   };
@@ -87,7 +88,7 @@ const transform = (
 */
 
 describe('babel plugin', () => {
-  it('should handle style assigned to const', () => {
+  it.only('should handle style assigned to const', () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 

@@ -127,7 +127,9 @@ fn vanilla_extract<
     filename: String,
 ) -> impl Fold + 'a {
     let visitor =
-        create_extract_visitor(source_map, comments, filename);
+        create_extract_visitor(source_map, comments, &filename,
+            "dummy_transform_pkg_name",
+            "dummy_transform_pkg_dir",);
 
     as_folder(visitor)
 }

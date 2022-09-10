@@ -17,10 +17,19 @@ pub fn process(program: Program, metadata: TransformPluginProgramMetadata) -> Pr
         "unknown.js"
     };
 
+    let cwd = metadata.get_context(&TransformPluginMetadataContextKind::Cwd);
+    let cwd = if let Some(cwd) = cwd.as_deref() {
+        cwd
+    } else {
+        "."
+    };
+
     let visitor = create_extract_visitor(
         std::sync::Arc::new(metadata.source_map),
         metadata.comments.as_ref(),
-        filename.to_string(),
+        filename,
+        "swc-plugin-vanilla-extract",
+        cwd,
     );
 
     program.fold_with(&mut as_folder(visitor))

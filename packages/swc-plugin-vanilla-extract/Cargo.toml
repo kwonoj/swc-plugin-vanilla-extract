@@ -12,4 +12,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 swc-vanilla-extract-visitor = { path = "../swc-vanilla-extract-visitor", version = "0.0.1" }
-swc_core                = { version = "0.22.0", features = ["plugin_transform"] }
+swc_core                = { version = "0.22.0", features = ["plugin_transform", "ecma_visit_path"] }
