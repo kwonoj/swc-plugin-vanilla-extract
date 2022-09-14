@@ -1,6 +1,6 @@
 [package]
 authors     = ["OJ Kwon <kwon.ohjoong@gmail.com>"]
-description = ""
+description = "Vanilla-extract custom transform visitor for SWC"
 edition     = "2021"
 license     = "MIT"
 name        = "swc-vanilla-extract-visitor"
