@@ -12,7 +12,7 @@ use swc_core::{
         ast::{
             CallExpr, Callee, ExportDecl, Expr, ExprOrSpread, ExprStmt, Ident, ImportDecl,
             ImportSpecifier, ImportStarAsSpecifier, Lit, MemberExpr, MemberProp, ModuleDecl,
-            ModuleExportName, ModuleItem, ObjectPatProp, Pat, PropName, Stmt, Str,
+            ModuleExportName, ModuleItem, ObjectPatProp, Pat, PropName, Stmt, Str, Prop, PropOrSpread,
         },
         atoms::JsWord,
         visit::{
@@ -317,6 +317,15 @@ impl DebugIdFindVisitor {
 
 fn extract_name<'r>(node: AstParentNodeRef<'r>) -> Option<String> {
     match node {
+        AstParentNodeRef::PropOrSpread(prop, _) => {
+            if let PropOrSpread::Prop(prop) = prop {
+                if let Prop::KeyValue(key_value) = &**prop {
+                    if let PropName::Ident(ident) = &key_value.key {
+                        return Some(ident.sym.to_string());
+                    }
+                }
+            }
+        }
         AstParentNodeRef::ObjectPatProp(pat_prop, _) => {
             if let ObjectPatProp::KeyValue(key_value) = pat_prop {
                 if let PropName::Ident(ident) = &key_value.key {
@@ -415,6 +424,7 @@ fn get_debug_id<'r>(ast_path: &mut AstNodePath<AstParentNodeRef<'r>>) -> Option<
                     }
                 }
 
+                println!("{:#?}", names);
                 if names.len() > 0 {
                     Some(names.join("_").to_string())
                 } else {
