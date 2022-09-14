@@ -91,7 +91,7 @@ fn get_relavant_call(
     call_expr: &CallExpr,
     namespace_import: &Option<Ident>,
     import_identifiers: &HashMap<Ident, String>,
-) -> Option<Ident> {
+) -> Option<String> {
     let callee = &call_expr.callee;
 
     if let Some(namespace_import) = namespace_import {
@@ -120,7 +120,7 @@ fn get_relavant_call(
             }
         });
 
-        return import_info.cloned();
+        return import_info.map(|key| import_identifiers.get(key)).flatten().cloned();
     }
 }
 
@@ -269,6 +269,7 @@ impl Visit for ImportCollectVisitor {
                                 ModuleExportName::Ident(ident) => &*ident.sym,
                                 ModuleExportName::Str(str) => &*str.value,
                             };
+
 
                             if STYLE_FUNCTIONS.contains(&import_name) {
                                 self.import_identifiers
@@ -469,7 +470,7 @@ impl VisitAstPath for DebugIdFindVisitor {
             get_relavant_call(call_expr, &self.namespace_import, &self.import_identifiers);
 
         if let Some(used_export) = used_export {
-            if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&*used_export.sym) {
+            if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&used_export) {
                 if call_expr.args.len() < *max_params {
                     self.debug_id = get_debug_id(ast_path);
                 }
@@ -505,7 +506,7 @@ impl VisitMut for DebugIdInjectVisitor {
                 get_relavant_call(call_expr, &self.namespace_import, &self.import_identifiers);
 
             if let Some(used_export) = used_export {
-                if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&*used_export.sym) {
+                if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&used_export) {
                     if call_expr.args.len() < *max_params {
                         call_expr.args.push(ExprOrSpread {
                             spread: None,
