@@ -99,12 +99,20 @@ fn get_relavant_call(
             if !expr.is_member() {
                 return None;
             }
-            /* if (t.isIdentifier(callee.object, { name: namespaceImport })
-            ) {
-              return styleFunctions.find((exportName) =>
-                t.isIdentifier(callee.property, { name: exportName }),
-              );
-            } */
+
+            if let Expr::Member(member_expr) = &**expr {
+                if let Expr::Ident(ident) = &*member_expr.obj {
+                    if ident.sym == namespace_import.sym {
+                        return STYLE_FUNCTIONS.iter().find(|export_name| {
+                            if let MemberProp::Ident(ident) = &member_expr.prop {
+                                &*ident.sym == **export_name
+                            } else {
+                                false
+                            }
+                        }).map(|v| v.to_string());
+                    }
+                }
+            }
         }
         return None;
     } else {
