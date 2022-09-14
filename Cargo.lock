@@ -1262,6 +1262,8 @@ dependencies = [
 name = "swc-plugin-vanilla-extract"
 version = "0.0.1"
 dependencies = [
+ "serde",
+ "serde_json",
  "swc-vanilla-extract-visitor",
  "swc_core",
 ]

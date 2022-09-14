@@ -1,3 +1,4 @@
+use serde_json::Value;
 use swc_core::{
     ecma::{ast::Program, visit::*},
     plugin::{
@@ -24,11 +25,25 @@ pub fn process(program: Program, metadata: TransformPluginProgramMetadata) -> Pr
         "."
     };
 
+    let config = metadata.get_transform_plugin_config();
+    let package_name = if let Some(config) = config {
+        let config: Value = serde_json::from_str(&config).expect("Config should be serializable");
+
+        let pkg_name = config["packageName"].as_str();
+        if let Some(pkg_name) = pkg_name {
+            pkg_name.to_string()
+        } else {
+            "swc-plugin-vanilla-extract".to_string()
+        }
+    } else {
+        "swc-plugin-vanilla-extract".to_string()
+    };
+
     let visitor = create_extract_visitor(
         std::sync::Arc::new(metadata.source_map),
         metadata.comments.as_ref(),
         filename,
-        "swc-plugin-vanilla-extract",
+        &package_name,
         cwd,
     );
 
