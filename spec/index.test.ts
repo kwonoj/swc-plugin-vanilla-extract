@@ -8,13 +8,14 @@ const pluginBinary = path.resolve(
 
 const transform = (
   code: string,
+  module?: "commonjs" | "es6",
   transformOptions?: Options,
   filename?: string
 ) => {
-  const pluginOptions = {}
+  const pluginOptions = {};
 
   const options: Options = {
-    filename: filename ?? './dir/mockFilename.css.ts',
+    filename: filename ?? "dir/mockFilename.css.ts",
     jsc: {
       parser: {
         syntax: "ecmascript",
@@ -25,13 +26,13 @@ const transform = (
     },
     isModule: transformOptions?.isModule ?? true,
     module: {
-      type: "commonjs",
+      type: module || "es6",
       strict: !!transformOptions?.isModule ?? false,
     },
   };
 
   if (process.env.SWC_TRANSFORM_CUSTOM === "1") {
-    const { transformSync } = require("../../index");
+    const { transformSync } = require("../index");
     return transformSync(
       code,
       true,
@@ -59,35 +60,10 @@ const transform = (
   return transformSync(code, options).code;
 };
 
-/*
-import { transformSync } from '@babel/core';
-import { Options } from './types';
-import plugin from './';
+const cwd = path.resolve(__dirname, "..");
 
-type Options = { alias?: string };
-
-const transform = (
-  source: string,
-  options: Options = {},
-  filename = './dir/mockFilename.css.ts',
-) => {
-  const result = transformSync(source, {
-    filename,
-    cwd: __dirname,
-    plugins: [[plugin, options]],
-    configFile: false,
-  });
-
-  if (!result) {
-    throw new Error('No result');
-  }
-
-  return result.code;
-};
-*/
-
-describe('babel plugin', () => {
-  it('should handle style assigned to const', () => {
+describe("babel plugin", () => {
+  it("should handle style assigned to const", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -97,20 +73,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       const one = style({
-        zIndex: 2
-      }, \\"one\\");
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 2
+      }, "one");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle styleVariants assigned to const', () => {
+  it("should handle styleVariants assigned to const", () => {
     const source = `
       import { styleVariants } from '@vanilla-extract/css';
 
@@ -120,22 +94,20 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { styleVariants } from '@vanilla-extract/css';
       const colors = styleVariants({
-        red: {
-          color: 'red'
-        }
-      }, \\"colors\\");
-
-      __vanilla_filescope__.endFileScope();"
+          red: {
+              color: 'red'
+          }
+      }, "colors");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle styleVariants with mapper assigned to const', () => {
+  it("should handle styleVariants with mapper assigned to const", () => {
     const source = `
       import { styleVariants } from '@vanilla-extract/css';
 
@@ -145,22 +117,20 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { styleVariants } from '@vanilla-extract/css';
       const colors = styleVariants({
-        red: 'red'
-      }, color => ({
-        color
-      }), \\"colors\\");
-
-      __vanilla_filescope__.endFileScope();"
+          red: 'red'
+      }, (color)=>({
+              color
+          }), "colors");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle style assigned to default export', () => {
+  it("should handle style assigned to default export", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -170,20 +140,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       export default style({
-        zIndex: 2
-      }, \\"default\\");
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 2
+      }, "default");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle style assigned to object property', () => {
+  it("should handle style assigned to object property", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -197,24 +165,22 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       const test = {
-        one: {
-          two: style({
-            zIndex: 2
-          }, \\"test_one_two\\")
-        }
+          one: {
+              two: style({
+                  zIndex: 2
+              }, "test_one_two")
+          }
       };
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle style returned from an arrow function', () => {
+  it("should handle style returned from an arrow function", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -226,23 +192,20 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
-
-      const test = () => {
-        return style({
-          color: 'red'
-        }, \\"test\\");
+      const test = ()=>{
+          return style({
+              color: 'red'
+          }, "test");
       };
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle style returned implicitly from an arrow function', () => {
+  it("should handle style returned implicitly from an arrow function", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -252,21 +215,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
-
-      const test = () => style({
-        color: 'red'
-      }, \\"test\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const test = ()=>style({
+              color: 'red'
+          }, "test");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle style returned from a function', () => {
+  it("should handle style returned from a function", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -278,23 +238,20 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
-
       function test() {
-        return style({
-          color: 'red'
-        }, \\"test\\");
+          return style({
+              color: 'red'
+          }, "test");
       }
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle globalStyle', () => {
+  it("should handle globalStyle", () => {
     const source = `
       import { globalStyle } from '@vanilla-extract/css';
 
@@ -302,20 +259,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { globalStyle } from '@vanilla-extract/css';
       globalStyle('html, body', {
-        margin: 0
+          margin: 0
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createVar assigned to const', () => {
+  it("should handle createVar assigned to const", () => {
     const source = `
       import { createVar } from '@vanilla-extract/css';
 
@@ -323,18 +278,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createVar } from '@vanilla-extract/css';
-      const myVar = createVar(\\"myVar\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const myVar = createVar("myVar");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createContainer assigned to const', () => {
+  it("should handle createContainer assigned to const", () => {
     const source = `
       import { createContainer } from '@vanilla-extract/css';
 
@@ -342,18 +295,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createContainer } from '@vanilla-extract/css';
-      const myContainer = createContainer(\\"myContainer\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const myContainer = createContainer("myContainer");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle fontFace assigned to const', () => {
+  it("should handle fontFace assigned to const", () => {
     const source = `
       import { fontFace } from '@vanilla-extract/css';
 
@@ -363,20 +314,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { fontFace } from '@vanilla-extract/css';
       const myFont = fontFace({
-        src: 'local(\\"Comic Sans MS\\")'
-      }, \\"myFont\\");
-
-      __vanilla_filescope__.endFileScope();"
+          src: 'local("Comic Sans MS")'
+      }, "myFont");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle globalFontFace', () => {
+  it("should handle globalFontFace", () => {
     const source = `
       import { globalFontFace } from '@vanilla-extract/css';
 
@@ -386,20 +335,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { globalFontFace } from '@vanilla-extract/css';
       globalFontFace('myFont', {
-        src: 'local(\\"Comic Sans MS\\")'
+          src: 'local("Comic Sans MS")'
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle keyframes assigned to const', () => {
+  it("should handle keyframes assigned to const", () => {
     const source = `
       import { keyframes } from '@vanilla-extract/css';
 
@@ -410,25 +357,23 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { keyframes } from '@vanilla-extract/css';
       const myAnimation = keyframes({
-        from: {
-          transform: 'rotate(0deg)'
-        },
-        to: {
-          transform: 'rotate(360deg)'
-        }
-      }, \\"myAnimation\\");
-
-      __vanilla_filescope__.endFileScope();"
+          from: {
+              transform: 'rotate(0deg)'
+          },
+          to: {
+              transform: 'rotate(360deg)'
+          }
+      }, "myAnimation");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle global keyframes', () => {
+  it("should handle global keyframes", () => {
     const source = `
       import { globalKeyframes } from '@vanilla-extract/css';
 
@@ -439,25 +384,23 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { globalKeyframes } from '@vanilla-extract/css';
       globalKeyframes('myKeyframes', {
-        from: {
-          transform: 'rotate(0deg)'
-        },
-        to: {
-          transform: 'rotate(360deg)'
-        }
+          from: {
+              transform: 'rotate(0deg)'
+          },
+          to: {
+              transform: 'rotate(360deg)'
+          }
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createTheme assigned to const', () => {
+  it("should handle createTheme assigned to const", () => {
     const source = `
       import { createTheme } from '@vanilla-extract/css';
 
@@ -465,18 +408,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createTheme } from '@vanilla-extract/css';
-      const darkTheme = createTheme({}, {}, \\"darkTheme\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const darkTheme = createTheme({}, {}, "darkTheme");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createTheme using destructuring', () => {
+  it("should handle createTheme using destructuring", () => {
     const source = `
       import { createTheme } from '@vanilla-extract/css';
 
@@ -484,18 +425,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createTheme } from '@vanilla-extract/css';
-      const [theme, vars] = createTheme({}, {}, \\"theme\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const [theme, vars] = createTheme({}, {}, "theme");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createTheme using destructuring when already compiled', () => {
+  it("should handle createTheme using destructuring when already compiled", () => {
     const source = `
       import { createTheme } from '@vanilla-extract/css';
 
@@ -506,22 +445,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createTheme } from '@vanilla-extract/css';
-
-      var _createTheme = createTheme({}, \\"myThemeClass\\"),
-          _createTheme2 = _slicedToArray(_createTheme, 2),
-          myThemeClass = _createTheme2[0],
-          vars = _createTheme2[1];
-
-      __vanilla_filescope__.endFileScope();"
+      var _createTheme = createTheme({}, "_createTheme"), _createTheme2 = _slicedToArray(_createTheme, 2), myThemeClass = _createTheme2[0], vars = _createTheme2[1];
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createGlobalTheme', () => {
+  it("should handle createGlobalTheme", () => {
     const source = `
       import { createGlobalTheme } from '@vanilla-extract/css';
 
@@ -529,20 +462,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createGlobalTheme } from '@vanilla-extract/css';
       const vars = createGlobalTheme(':root', {
-        foo: 'bar'
+          foo: 'bar'
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle createThemeContract', () => {
+  it("should handle createThemeContract", () => {
     const source = `
       import { createThemeContract } from '@vanilla-extract/css';
 
@@ -552,20 +483,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { createThemeContract } from '@vanilla-extract/css';
       const vars = createThemeContract({
-        foo: 'bar'
+          foo: 'bar'
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle recipe assigned to const', () => {
+  it("should handle recipe assigned to const", () => {
     const source = `
       import { recipe } from '@vanilla-extract/recipes';
 
@@ -573,18 +502,16 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { recipe } from '@vanilla-extract/recipes';
-      const button = recipe({}, \\"button\\");
-
-      __vanilla_filescope__.endFileScope();"
+      const button = recipe({}, "button");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should ignore functions that already supply a debug name', () => {
+  it("should ignore functions that already supply a debug name", () => {
     const source = `
       import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -600,27 +527,25 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style, styleVariants } from '@vanilla-extract/css';
       const three = style({
-        testStyle: {
-          zIndex: 2
-        }
+          testStyle: {
+              zIndex: 2
+          }
       }, 'myDebugValue');
       const four = styleVariants({
-        red: {
-          color: 'red'
-        }
-      }, 'myDebugValue', \\"four\\");
-
-      __vanilla_filescope__.endFileScope();"
+          red: {
+              color: 'red'
+          }
+      }, 'myDebugValue', "four");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should only apply debug ids to functions imported from the relevant package', () => {
+  it("should only apply debug ids to functions imported from the relevant package", () => {
     const source = `
       import { style } from 'some-other-package';
 
@@ -630,20 +555,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from 'some-other-package';
       const three = style({
-        zIndex: 2
+          zIndex: 2
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should only apply to .css.ts files', () => {
+  it("should only apply to .css.ts files", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -652,16 +575,17 @@ describe('babel plugin', () => {
       });
     `;
 
-    expect(transform(source, {}, './dir/mockFilename.ts'))
+    expect(transform(source, "es6", {}, "dir/mockFilename.ts"))
       .toMatchInlineSnapshot(`
       "import { style } from '@vanilla-extract/css';
       const three = style({
-        zIndex: 2
-      });"
+          zIndex: 2
+      });
+      "
     `);
   });
 
-  it('should ignore files that already have filescope information', () => {
+  it("should ignore files that already have filescope information", () => {
     const source = `
       import { setFileScope, endFileScope } from '@vanilla-extract/css/fileScope';
       setFileScope('src/dir/someFileName.css.ts', 'some-package');
@@ -678,13 +602,14 @@ describe('babel plugin', () => {
       setFileScope('src/dir/someFileName.css.ts', 'some-package');
       import { style } from '@vanilla-extract/css';
       const three = style({
-        zIndex: 2
+          zIndex: 2
       });
-      endFileScope();"
+      endFileScope();
+      "
     `);
   });
 
-  it('should use CJS when it is detected', () => {
+  it("should use CJS when it is detected", () => {
     const source = `
       const { style } = require('@vanilla-extract/css');
 
@@ -694,23 +619,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "const __vanilla_filescope__ = require('@vanilla-extract/css/fileScope');
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
-      const {
-        style
-      } = require('@vanilla-extract/css');
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
+      const { style  } = require('@vanilla-extract/css');
       const three = style({
-        zIndex: 2
+          zIndex: 2
       });
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should ignore CJS files that already have filescope information', () => {
+  it("should ignore CJS files that already have filescope information", () => {
     const source = `
       const { setFileScope, endFileScope } = require('@vanilla-extract/css/fileScope');
       setFileScope('src/dir/someFileName.css.ts', 'some-package');
@@ -723,25 +643,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "const {
-        setFileScope,
-        endFileScope
-      } = require('@vanilla-extract/css/fileScope');
-
+      "const { setFileScope , endFileScope  } = require('@vanilla-extract/css/fileScope');
       setFileScope('src/dir/someFileName.css.ts', 'some-package');
-
-      const {
-        style
-      } = require('@vanilla-extract/css');
-
+      const { style  } = require('@vanilla-extract/css');
       const three = style({
-        zIndex: 2
+          zIndex: 2
       });
-      endFileScope();"
+      endFileScope();
+      "
     `);
   });
 
-  it('should handle renaming imports', () => {
+  it("should handle renaming imports", () => {
     const source = `
       import { style as specialStyle } from '@vanilla-extract/css';
 
@@ -751,20 +664,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style as specialStyle } from '@vanilla-extract/css';
       const four = specialStyle({
-        zIndex: 2
-      }, \\"four\\");
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 2
+      }, "four");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle anonymous style in arrays', () => {
+  it("should handle anonymous style in arrays", () => {
     const source = `
        import { style } from '@vanilla-extract/css';
 
@@ -776,20 +687,20 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
-      export const height = [style({
-        zIndex: 2
-      }, \\"height\\")];
-
-      __vanilla_filescope__.endFileScope();"
+      export const height = [
+          style({
+              zIndex: 2
+          }, "height")
+      ];
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle object key with anonymous style in arrays', () => {
+  it("should handle object key with anonymous style in arrays", () => {
     const source = `
        import { style } from '@vanilla-extract/css';
 
@@ -801,22 +712,22 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       export const height = {
-        full: [style({
-          zIndex: 2
-        }, \\"height_full\\")]
+          full: [
+              style({
+                  zIndex: 2
+              }, "height_full")
+          ]
       };
-
-      __vanilla_filescope__.endFileScope();"
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle namespace imports', () => {
+  it("should handle namespace imports", () => {
     const source = `
       import * as css from '@vanilla-extract/css';
 
@@ -826,20 +737,18 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import * as css from '@vanilla-extract/css';
       const one = css.style({
-        zIndex: 2
-      }, \\"one\\");
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 2
+      }, "one");
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle nested call expressions', () => {
+  it("should handle nested call expressions", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -857,26 +766,24 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       const one = instrument(style({
-        zIndex: 1
-      }, \\"one\\"));
+          zIndex: 1
+      }, "one"));
       const two = instrument(instrument(style({
-        zIndex: 2
-      }, \\"two\\")));
+          zIndex: 2
+      }, "two")));
       const three = instrument(instrument(instrument(style({
-        zIndex: 3
-      }, \\"three\\"))));
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 3
+      }, "three"))));
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 
-  it('should handle instrumentation via sequence expresions', () => {
+  it("should handle instrumentation via sequence expresions", () => {
     const source = `
       import { style } from '@vanilla-extract/css';
 
@@ -886,16 +793,14 @@ describe('babel plugin', () => {
     `;
 
     expect(transform(source)).toMatchInlineSnapshot(`
-      "import * as __vanilla_filescope__ from '@vanilla-extract/css/fileScope';
-
-      __vanilla_filescope__.setFileScope(\\"src/dir/mockFilename.css.ts\\", \\"@vanilla-extract/babel-plugin\\");
-
+      "import * as __vanilla_filescope__ from "@vanilla-extract/css/fileScope";
+      __vanilla_filescope__.setFileScope("${cwd}/dir/mockFilename.css.ts", "swc-plugin-vanilla-extract");
       import { style } from '@vanilla-extract/css';
       const one = (something++, style({
-        zIndex: 1
-      }, \\"one\\"));
-
-      __vanilla_filescope__.endFileScope();"
+          zIndex: 1
+      }, "one"));
+      __vanilla_filescope__.endFileScope();
+      "
     `);
   });
 });

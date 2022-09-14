@@ -71,7 +71,7 @@ pub fn transform_sync(
     s: String,
     _is_module: bool,
     opts: Buffer,
-    instrument_opts: Buffer,
+    _instrument_opts: Buffer,
 ) -> napi::Result<TransformOutput> {
     let c = get_compiler();
 
@@ -123,11 +123,20 @@ fn vanilla_extract<
 >(
     source_map: Arc<S>,
     comments: C,
-    instrument_options: String,
+    _instrument_options: String,
     filename: String,
 ) -> impl Fold + 'a {
-    let visitor =
-        create_extract_visitor(source_map, comments, filename);
+    let visitor = create_extract_visitor(
+        source_map,
+        comments,
+        &filename,
+        "swc-plugin-vanilla-extract",
+        std::env::current_dir()
+            .expect("Should exist")
+            .as_os_str()
+            .to_str()
+            .expect("Should exist"),
+    );
 
     as_folder(visitor)
 }
