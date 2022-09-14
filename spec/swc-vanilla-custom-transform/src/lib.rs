@@ -71,7 +71,7 @@ pub fn transform_sync(
     s: String,
     _is_module: bool,
     opts: Buffer,
-    instrument_opts: Buffer,
+    _instrument_opts: Buffer,
 ) -> napi::Result<TransformOutput> {
     let c = get_compiler();
 

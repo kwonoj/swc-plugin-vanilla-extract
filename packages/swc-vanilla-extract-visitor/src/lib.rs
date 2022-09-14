@@ -7,12 +7,13 @@ use std::{
 };
 
 use swc_core::{
-    common::{comments::Comments, SourceMapper, DUMMY_SP, pass::AstNodePath},
+    common::{comments::Comments, pass::AstNodePath, SourceMapper, DUMMY_SP},
     ecma::{
         ast::{
             CallExpr, Callee, ExportDecl, Expr, ExprOrSpread, ExprStmt, Ident, ImportDecl,
             ImportSpecifier, ImportStarAsSpecifier, Lit, MemberExpr, MemberProp, ModuleDecl,
-            ModuleExportName, ModuleItem, ObjectPatProp, Pat, PropName, Stmt, Str, Prop, PropOrSpread,
+            ModuleExportName, ModuleItem, ObjectPatProp, Pat, Prop, PropName, PropOrSpread, Stmt,
+            Str,
         },
         atoms::JsWord,
         visit::{
@@ -103,13 +104,16 @@ fn get_relavant_call(
             if let Expr::Member(member_expr) = &**expr {
                 if let Expr::Ident(ident) = &*member_expr.obj {
                     if ident.sym == namespace_import.sym {
-                        return STYLE_FUNCTIONS.iter().find(|export_name| {
-                            if let MemberProp::Ident(ident) = &member_expr.prop {
-                                &*ident.sym == **export_name
-                            } else {
-                                false
-                            }
-                        }).map(|v| v.to_string());
+                        return STYLE_FUNCTIONS
+                            .iter()
+                            .find(|export_name| {
+                                if let MemberProp::Ident(ident) = &member_expr.prop {
+                                    &*ident.sym == **export_name
+                                } else {
+                                    false
+                                }
+                            })
+                            .map(|v| v.to_string());
                     }
                 }
             }
@@ -128,7 +132,10 @@ fn get_relavant_call(
             }
         });
 
-        return import_info.map(|key| import_identifiers.get(key)).flatten().cloned();
+        return import_info
+            .map(|key| import_identifiers.get(key))
+            .flatten()
+            .cloned();
     }
 }
 
@@ -277,7 +284,6 @@ impl Visit for ImportCollectVisitor {
                                 ModuleExportName::Ident(ident) => &*ident.sym,
                                 ModuleExportName::Str(str) => &*str.value,
                             };
-
 
                             if STYLE_FUNCTIONS.contains(&import_name) {
                                 self.import_identifiers
@@ -433,7 +439,6 @@ fn get_debug_id<'r>(ast_path: &mut AstNodePath<AstParentNodeRef<'r>>) -> Option<
                     }
                 }
 
-                println!("{:#?}", names);
                 if names.len() > 0 {
                     Some(names.join("_").to_string())
                 } else {
@@ -450,7 +455,7 @@ fn get_debug_id<'r>(ast_path: &mut AstNodePath<AstParentNodeRef<'r>>) -> Option<
 impl VisitAstPath for DebugIdFindVisitor {
     fn visit_call_expr<'ast: 'r, 'r>(
         &mut self,
-        call_expr: &CallExpr,
+        call_expr: &'r CallExpr,
         ast_path: &mut AstNodePath<AstParentNodeRef<'r>>,
     ) {
         if self.is_compiled {
@@ -484,7 +489,8 @@ impl VisitAstPath for DebugIdFindVisitor {
                 }
             }
         }
-        // this is terminal, we don't need to traverse down
+
+        call_expr.visit_children_with_path(self, ast_path);
     }
 }
 
@@ -509,13 +515,13 @@ impl DebugIdInjectVisitor {
 
 impl VisitMut for DebugIdInjectVisitor {
     fn visit_mut_call_expr(&mut self, call_expr: &mut CallExpr) {
-        if let Some(debug_id) = self.debug_id.take() {
-            let used_export =
-                get_relavant_call(call_expr, &self.namespace_import, &self.import_identifiers);
+        let used_export =
+            get_relavant_call(call_expr, &self.namespace_import, &self.import_identifiers);
 
-            if let Some(used_export) = used_export {
-                if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&used_export) {
-                    if call_expr.args.len() < *max_params {
+        if let Some(used_export) = used_export {
+            if let Some(max_params) = DEBUGGABLE_FUNCTION_CONFIG.get(&used_export) {
+                if call_expr.args.len() < *max_params {
+                    if let Some(debug_id) = self.debug_id.take() {
                         call_expr.args.push(ExprOrSpread {
                             spread: None,
                             expr: Box::new(Expr::Lit(Lit::Str(Str::from(debug_id)))),
@@ -524,6 +530,8 @@ impl VisitMut for DebugIdInjectVisitor {
                 }
             }
         }
+
+        call_expr.visit_mut_children_with(self);
     }
 }
 
