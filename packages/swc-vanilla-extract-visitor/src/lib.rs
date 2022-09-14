@@ -352,7 +352,7 @@ fn extract_name<'r>(node: AstParentNodeRef<'r>) -> Option<String> {
             return Some(fn_decl.ident.sym.to_string());
         }
         AstParentNodeRef::ModuleDecl(module_decl, _) => {
-            if module_decl.is_export_default_decl() {
+            if module_decl.is_export_default_expr() || module_decl.is_export_default_decl() {
                 return Some("default".to_string());
             }
         }
