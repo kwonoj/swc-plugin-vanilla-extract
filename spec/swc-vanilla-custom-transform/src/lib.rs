@@ -14,7 +14,11 @@ use backtrace::Backtrace;
 
 use swc_core::{
     base::{config::Options, Compiler, TransformOutput},
-    common::{comments::Comments, sync::Lazy, FileName, FilePathMapping, SourceMap},
+    common::{
+        comments::{Comments, SingleThreadedComments},
+        sync::Lazy,
+        FileName, FilePathMapping, SourceMap,
+    },
     ecma::{
         transforms::base::pass::noop,
         visit::{as_folder, Fold},
@@ -76,7 +80,6 @@ pub fn transform_sync(
     let c = get_compiler();
 
     let mut options: Options = get_deserialized(&opts)?;
-    //let instrument_option: InstrumentOptions = get_deserialized(&instrument_opts)?;
     let instrument_option = "dummy".to_string();
 
     if !options.filename.is_empty() {
@@ -100,15 +103,16 @@ pub fn transform_sync(
                     None,
                     handler,
                     &options,
-                    |_program, comments| {
+                    Default::default(),
+                    |_program| {
                         vanilla_extract(
                             c.cm.clone(),
-                            comments.clone(),
+                            SingleThreadedComments::default(),
                             instrument_option,
                             filename.to_string(),
                         )
                     },
-                    |_, _| noop(),
+                    |_| noop(),
                 )
             })
         },
