@@ -1,6 +1,6 @@
 {
   "name": "swc-plugin-vanilla-extract",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "./target/wasm32-wasi/release/swc_plugin_vanilla_extract.wasm",
   "napi": {

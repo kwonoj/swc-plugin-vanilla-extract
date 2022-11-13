@@ -5,7 +5,7 @@ edition     = "2021"
 license     = "MIT"
 name        = "swc-plugin-vanilla-extract"
 repository  = "https://github.com/kwonoj/swc-plugin-vanilla-extract"
-version     = "0.0.1"
+version     = "0.0.2"
 
 [lib]
 crate-type = ["cdylib"]
@@ -13,5 +13,5 @@ crate-type = ["cdylib"]
 [dependencies]
 serde = "1.0.147"
 serde_json = "1.0.87"
-swc-vanilla-extract-visitor = { path = "../swc-vanilla-extract-visitor", version = "0.0.1" }
+swc-vanilla-extract-visitor = { path = "../swc-vanilla-extract-visitor", version = "0.0.2" }
 swc_core                = { version = "0.43.2", features = ["plugin_transform", "ecma_visit_path"] }
