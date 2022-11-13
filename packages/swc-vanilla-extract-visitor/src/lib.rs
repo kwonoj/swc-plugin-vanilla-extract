@@ -104,7 +104,7 @@ impl VisitMut for VanillaExtractVisitor {
                     span: DUMMY_SP,
                     local: FILE_SCOPE_IMPORT_NAME.clone(),
                 })],
-                src: Str::from(FILE_SCOPE_PACKAGE_IDENTIFIER),
+                src: Box::new(Str::from(FILE_SCOPE_PACKAGE_IDENTIFIER)),
                 type_only: false,
                 asserts: None,
             }));
