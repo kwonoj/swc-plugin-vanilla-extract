@@ -23,9 +23,9 @@ serde = { version = "1.0.147", features = ["derive"] }
 serde_json = { version = "1.0.87", features = ["unbounded_depth"] }
 
 swc-vanilla-extract-visitor = { path = "../../packages/swc-vanilla-extract-visitor" }
-swc_core = { version = "0.43.2", features = [
+swc_core = { version = "0.75.1", features = [
   "common_concurrent",
-  "ecma_transforms",
+  "ecma_plugin_transform",
   "ecma_ast",
   "allocator_node",
   "ecma_visit",
