@@ -11,7 +11,7 @@ version     = "0.0.2"
 once_cell = "1.16.0"
 regex          = "1.7.0"
 path-slash = "0.2.1"
-swc_core                = { version = "0.43.2", features = ["common", "ecma_quote", "ecma_ast", "ecma_visit", "ecma_visit_path"] }
+swc_core                = { version = "0.75.11", features = ["common", "ecma_quote", "ecma_ast", "ecma_visit", "ecma_visit_path"] }
 
 [dev-dependencies]
 pretty_assertions = "1.3.0"
